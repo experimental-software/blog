@@ -2,3 +2,8 @@
 
 Lessons learned from experimental software development
 
+## Dev
+
+```
+gradle serve
+```

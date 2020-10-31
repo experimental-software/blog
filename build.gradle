@@ -1,0 +1,6 @@
+task serve(type: Exec) {
+    executable "bash"
+    args "-c", '''
+        jekyll serve --livereload
+    '''
+}
