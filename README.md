@@ -2,8 +2,8 @@
 
 Lessons learned from experimental software development
 
-## Dev
+## Run server on localhost
 
 ```
-gradle serve
+./test.sh
 ```
