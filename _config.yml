@@ -33,6 +33,10 @@ github_username:  jmewes
 theme: minima
 plugins:
   - jekyll-feed
+  - jekyll-redirect-from
+  
+whitelist:
+  - jekyll-redirect-from
 
 header_pages:
   - search.md
