@@ -4,15 +4,9 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](https://jekyllrb.com/)
+Experimental Software is an imaginary software development company for educational purposes.
 
-You can find the source code for Minima at GitHub:
-[jekyll][jekyll-organization] /
-[minima](https://github.com/jekyll/minima)
+The name can have two different meanings:
 
-You can find the source code for Jekyll at GitHub:
-[jekyll][jekyll-organization] /
-[jekyll](https://github.com/jekyll/jekyll)
-
-
-[jekyll-organization]: https://github.com/jekyll
+1. A super professional company which builds world-class products with [Lean Experimentation](https://ssir.org/articles/entry/the_promise_of_lean_experimentation).
+2. Some random, weird name because all previous ideas were already claimed by other companies ([cylon.com](http://cylon.com/), [leanx.eu](https://www.leanx.eu), [effective-software.com](https://www.effective-software.com), etc.); used for alpha versions of new products.
