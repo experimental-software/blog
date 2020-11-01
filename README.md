@@ -7,3 +7,7 @@ Lessons learned from experimental software development
 ```
 ./test.sh
 ```
+
+## References
+
+- https://kramdown.gettalong.org/quickref.html
