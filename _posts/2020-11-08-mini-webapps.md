@@ -171,7 +171,7 @@ In this way, you can publish the mini webapp to GitHub pages or give your collea
 Alternatively, you might want to publish the generated mini webapp to your own webserver:
 
 ```
-rsync -r docs/web/* root@${HOST}:${DIRECTORY}
+rsync -r docs/* root@${HOST}:${DIRECTORY}
 ```
 
 ## References
