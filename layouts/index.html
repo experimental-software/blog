@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{ .Site.Title }}</title>
+</head>
+
+<body>
+  <h1>Experimental Software Blog</h1>
+  <hr />
+  
+  {{ .Content}}
+  
+  <table border="1" style="width:100%;">
+    
+    <tr>
+      <th style="width:120px;">Published at</th>
+      <th>Title</th>
+    </tr>
+    
+    {{ range .Data.Pages }}
+    
+      {{ if .Params.PublishedAt }}
+        <tr>
+          <td>
+            {{ .Params.PublishedAt }}
+          </td>
+          <td>
+            <a href="{{ .Permalink | relURL }}" title="{{ .Title }}">{{ .Title }}</a>
+          </td>
+        </tr>
+        
+      {{ end }}
+        
+    {{ end }} 
+
+  </table>
+  
+  <ol>
+    
+
+    
+  </ol>
+  
+  <hr />
+  
+  <a href="{{ "imprint" | relURL }}">Imprint</a>
+  
+</body>
+
+</html>

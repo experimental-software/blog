@@ -1,0 +1,26 @@
+<html>
+<head>
+  <title>{{ .Title}}</title>
+</head>
+<body>
+  <h1>{{ .Title}}</h1>
+  
+  <hr />
+  
+  {{ if .Params.Purpose }}
+    <p>
+      <i>{{ .Params.Purpose }}</i>
+    </p>
+    
+    <hr />
+  {{ end }}
+
+  
+  {{ .Content}}
+  
+  <hr />
+  
+  <a href="{{ "imprint" | relURL }}">Imprint</a>
+  
+</body>
+</html>
