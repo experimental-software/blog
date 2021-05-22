@@ -1,11 +1,10 @@
 ---
 title: Google Text to Speech
 draft: false
-subtitle: xxx
 publishedAt: 2021-05-22
 ---
 
-This blog post show how to generate MP3 files from text with the Google Cloud speech synthesizer and the Unix command-line interface.
+This blog post shows how to generate MP3 files from text with the Google Cloud speech synthesizer and the Unix command-line interface.
 
 ## Setup
 
@@ -13,7 +12,7 @@ To setup the Google Cloud account with the Text-to-Speech functionality, follow 
 
 Then you need to export an environment variable with the key file as value.
 
-```
+```bash
 export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/mykey.json
 ```
 
@@ -55,7 +54,7 @@ curl -X POST \
 
 The response for the generation request is a JSON payload which contains an `audioContent` property with the MP3 being a base 64 encoded binary.
 
-```
+```bash
 cat response.json | jq -r '.audioContent' | base64 -d > result.mp3
 ```
 

@@ -16,7 +16,7 @@
       <th>Title</th>
     </tr>
     
-    {{ range .Data.Pages }}
+    {{ range (.Data.Pages.ByParam "publishedAt").Reverse }}
     
       {{ if .Params.PublishedAt }}
         <tr>
