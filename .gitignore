@@ -1,6 +1,4 @@
 .jekyll-cache/
 _site/
 public/
-notes/
-*.org
-
+*~

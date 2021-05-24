@@ -1,0 +1,54 @@
+
+Google I/O Videos
+
+https://www.youtube.com/playlist?list=PLjxrf2q8roU19JGviPyeWc-SpDzou8Ug8
+
+* (2)  What's new in Flutter
+
+https://www.youtube.com/watch?v=40_tpAHwWcM&list=PLjxrf2q8roU19JGviPyeWc-SpDzou8Ug8&index=2
+
+- Zoey Fan - PM, Flutter (@ZoeyFan723)
+- Christ Seels - PM, Flutter (@csells)
+
+** Announcements
+
+The presentation started with a recap of Flutter's vision to expand from being a mobile frame towrads a portable framework for "ambient computing". Further, various companies where listed which are using Flutter across the world.
+
+** Flutter 2.2
+
+The new stable version of Flutter is version 2.2. They were primarily focused on improving the quality of the frameworks foundation.
+
+*** Infrastructure
+
+The Flutter releases are tested aginst Google's production apps, on more devices, and more operating systems.
+
+*** Dart
+
+With the latest Dart version shipped with Flutter, it is now possible to use type aliases for types and functions. Futher, null-safety is now the default for new app.
+
+*** Framework
+
+See the following links for an overview what was updated in the Flutter framework:
+
+- https://medium.com/flutter/whats-new-in-flutter-2-2-fd00c65e2039
+- https://flutter.dev/docs/development/tools/sdk/release-notes/release-notes-2.2.0
+
+*** Tools
+
+The memory tab in the DevTools was improved to show allocation stack traces and customer memory timeline events.
+
+*** Ecosystem
+
+- A new version of the Material Design guide will be released later this year, and will be fully supported for Flutter.
+- The [[https://pub.dev/packages/google_mobile_ads][Google Mobile Ads for Flutter]] was improved to support null-safety and adaptive banners (a new ad format).
+- The [[https://pub.dev/packages/pay][pay]] plugin was created to enable usage of Google Pay on Android and Apple Pay on iOS. (also see [[https://developers.googleblog.com/2021/05/google-pay-introduces-flutter-plugin-for-payments.html][developers.googleblog.com]])
+- The [[https://pub.dev/packages/in_app_purchase][in_app_purchase]] plugin now has production-quality support for in-app purchases via the App Store on iOS and Google Play on Android.
+- The connection between Flutter apps and Dart-based Google Cloud functions was improved (see [[https://dart.dev/go/cloud][dart.dev/go/cloud]])
+
+** Case studies
+
+*** Flutter Flow
+
+As example use case for Flutter Web, the Flutter Flow editor was presented by their creators. It is a "low code" solution for building Flutter apps in short time. See https://flutterflow.io/
+
+
