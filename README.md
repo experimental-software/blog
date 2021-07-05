@@ -2,6 +2,14 @@
 
 Lessons learned from experimental software development.
 
+## Authoring
+
+### Create a new blog post
+
+```
+./create_post.sh
+```
+
 ## Run Hugo with Draft Mode
 
 ```
