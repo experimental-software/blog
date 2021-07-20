@@ -7,7 +7,7 @@ publishedAt: YYYY-MM-DD
 
 #java #spring #showdev
 
-This blog post contains a description of a concept how to add a link to a REST resource provided by module A to a resource provided by module B without a module dependeny from A to B. The example implementation uses Spring Boot and Spring HATEOAS.
+This blog post describes a concept for adding a link to a REST resource provided by a module A to a REST resource provided by module B without a dependeny from A to B. The example implementation uses Spring Boot and Spring HATEOAS.
 
 ## Context
 
@@ -15,109 +15,107 @@ The final goal is to render a screen about patient details. Beside editing the a
 
 ![Screen concept](img/screen-concept.png)
 
-
 ## REST API
 
-When the app opens the patient details page it executes the following HTTP request to receive the required data:
+When the app opens the patient details page, it executes the following HTTP request to receive the required data:
 
-```
+```text
 GET /patients/{patientId}
 ```
 
-Beside the properties with the patient details, the response body contains a `_links` property which informs the frontend what actions can be done next. For example, after a patient has been created, the "start-visit" link can be used to start a new visit.
+The actions which can be done on the patient details page depend on the application state. Following the [HATEOAS](https://www.youtube.com/watch?v=_-vglnEttLI) concept for REST API design, the application state is indicated to the frontend applications with hyperlinks.  
+
+For example, it is only possible to start a new visit for patient if there is no active visit, yet. So right after the creation of a new patient, the patient resource contains a "start-visit" in the "_links" section.
 
 ```json
 {
-    "_id": "0a3949db-b2c4-4a8e-8ec4-5470f9a3e89e",
-    "age": null,
-    "gender": "MALE",
-    "name": "John Doe",
-    "patientCategory": "GENERAL",
-    "patientNumber": "10-1002",
-    "phoneNumber": "0123456789",
-    "residentialAddress": "Guesthouse",
-		"_links": {
-				"self": {
-						"href": "http://localhost:8080/api/patients/0a3949db-b2c4-4a8e-8ec4-5470f9a3e89e"
-				},
-				"start-visit": {
-						"href": "http://localhost:8080/api/patients/0a3949db-b2c4-4a8e-8ec4-5470f9a3e89e/visits"
-				}
-		}
+  "_id": "0a3949db-b2c4-4a8e-8ec4-5470f9a3e89e",
+  "name": "John Doe",
+  "address": "Guesthouse",
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/api/patients/0a3949db-b2c4-4a8e-8ec4-5470f9a3e89e"
+    },
+    "start-visit": {
+      "href": "http://localhost:8080/api/patients/0a3949db-b2c4-4a8e-8ec4-5470f9a3e89e/visits"
+    }
+  }
 }
 ```
 
-After executing a `POST` request on the "start-visit" link, this action is not applicable anymore, so it won't be included anymore in the `_links`. Assuming that there are no open bills for the patient, he can now be discharged by executing a `POST` request on the "discharge" link.
+After the visit has been started, the "start-visit" link disappears from the patient resource. But if there are no open bills for the patient, the patient can be discharged via the "discharge" link.
 
 ```json
 {
-    "_id": "0a3949db-b2c4-4a8e-8ec4-5470f9a3e89e",
-    "age": null,
-    "gender": "MALE",
-    "name": "John Doe",
-    "patientCategory": "GENERAL",
-    "patientNumber": "10-1002",
-    "phoneNumber": "0123456789",
-    "residentialAddress": "Guesthouse",
-		"_links": {
-				"self": {
-						"href": "http://localhost:8080/api/patients/0a3949db-b2c4-4a8e-8ec4-5470f9a3e89e"
-				},
-				"discharge": {
-						"href": "http://localhost:8080/api/patients/0a3949db-b2c4-4a8e-8ec4-5470f9a3e89e/visits"
-				}
-		}
+  "_id": "0a3949db-b2c4-4a8e-8ec4-5470f9a3e89e",
+  "name": "John Doe",
+  "address": "Guesthouse",
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/api/patients/0a3949db-b2c4-4a8e-8ec4-5470f9a3e89e"
+    },
+    "discharge": {
+      "href": "http://localhost:8080/api/patients/0a3949db-b2c4-4a8e-8ec4-5470f9a3e89e/visits/4fc13f43-41db-494c-a265-aca01c3ae2a4/discharge"
+    }
+  }
 }
 ```
 
 ## Module structure
 
-This scenario requires an interaction between three modules of the hospital application: the patient management, visit, and billing. The _patient management_ module takes care of the patient's master data, the _visit_ module takes care of the patient's journey through the hospital, and the _billing_ module takes care of all payment related things.
+This scenario requires interaction between three modules of the hospital application: patient management, visit, and billing. The _patient management_ module takes care of the patient's master data, the _visit_ module takes care of the patient's journey through the hospital, and the _billing_ module takes care of all payment related things.
 
 In order to keep the system's complexity low, circular dependencies should be avoided. So to support the requirements described above, the _visit_ module knows about the _patient management_ module and the _billing_ module. However, the _patient management_ module must not know neither about the _visit_ module nor about the _billing_ module.
 
-![Dependencies](img/dependencies.png)
+![Module dependencies](img/module-dependencies.png)
 
 ## Dependency inversion
 
-The way in which this can be achieved is that the class which takes care to create the `PatientsResource` - the `PatientsResourceAssembler` doesn't need to how _which_ links need to be added to the `PatientResource`, but only needs to know _that_ links need to be added. So the `PatientResourceAssembler` requests from a central registry which links are needed for the given `Patient` instance - the `ResourceExtensionsRegistry`.
+The way in which this can be achieved is that the class which takes care to create the patient resource, the `PatientResourceAssembler`, doesn't need to how _which_ links need to be added to the patient resource, but it only needs to know _that_ links need to be added.
+
+So the `PatientResourceAssembler` requests from a central registry, the `ResourceExtensionsRegistry`, which links should be added to the REST resource representation of a `Patient` entity. Every module which has a dependency on the _patient management_ module can add resource extensions for the patient resource to that central registry. To simplify that process, all the resource extensions need to be declared in a class derived from `ResourceExtensions`.
+
+![Class dependencies](img/class-dependencies.png)
+
+## Implementation details
+
+The following code snippet shows the part of `VisitModuleResourceExtensions` which registers a callback function for the `Patient` which is called whenever a REST resource for the `Patient` entity is requested.
 
 ```java
-var result = PatientModel.from(patient);
+@Component
+public class VisitModuleResourceExtensions extends ResourceExtensions {
+
+    // ...
+
+    @Override
+    public void init() {
+        registerLink(Patient.class, patient -> createStartVisitLink(patient));
+    }
+
+    // ...
+}
+```
+
+```java
+var resource = PatientModel.from(patient);
 var selfLink = linkTo(PatientController.class).slash(patient.getId()).withSelfRel();
-result.add(selfLink);
-result.add(resourceExtensionsRegistry.getLinks(Patient.class, patient));
-return result;
+resource.add(selfLink);
+resource.add(resourceExtensionsRegistry.getLinks(Patient.class, patient));
 ```
 
 So the _visit_ module needs to register a callback function in the `ResourceExtensionsRegistry`.
 
 ```java
 private Optional<Link> createStartVisitLink(Patient patient) {
-		if (visitRepository.hasActiveVisit(patient.getId())) {
-				return Optional.empty();
-		} else {
-				var link = linkTo(methodOn(VisitController.class).startVisit(patient.getId())).withRel("start-visit");
-				return Optional.of(link);
-		}
+    if (visitRepository.hasActiveVisit(patient.getId())) {
+        return Optional.empty();
+    } else {
+        var link = linkTo(methodOn(VisitController.class).startVisit(patient.getId())).withRel("start-visit");
+        return Optional.of(link);
+    }
 }
 ```
 
-
-One of the design ideas of the K.S.C.H. Workflows application is to structure its backend as a modular monolith, so that it is both fairly easy to operate and fairly easy to understand the source code.
-
-On the other hand, the screens of the app usually require information from many places in the system.
-
-Let's have a look at the following example: a screen which show the details of a patient and allows to trigger certain actions which are connected to the patient details. So for example a patient could be discharged by clicking on the "Discharge" button. However, the discharging a patient is only possible once they have paid their bill.
-
-So the app shows the details of a patient which resides in the "Patient Management" module. But it wants to trigger an action in the "Visit" module which depends on a state managed by the "Billing" module. However, since circular dependencies between modules, how can the state-dependent links be added to the `/patients` resource? - with inversion of control.
-
-The Patients resource doesn't need to know which links can be added to it, depending on the state of the rest of the application. It only needs to know that links can be added to it. So it can request the required links from a central link repository. All the modules which are interested in registering links to the patients resource can depend on the Patient Management module and then register a callback function which is then called with the actual patient resource, so that the state
-
-
-## Tradeoffs
-
-One module knows about the types of another, so that the `Patient` interface will be tranformed into a patient resource. This allows foreign modules to hook into the patient resource without being able to see it. On the other hand it allows one module to interact with the data structures of another which is not recommended by the Domain-Driven Design ideas which the K.S.C.H. Workflows project tries to follow. However, this should be okay since the other modules only have access on the getters can cannot modify the entities or call any non-official business logic.
 
 ## References
 
