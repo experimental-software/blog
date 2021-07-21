@@ -79,7 +79,7 @@ So the `PatientResourceAssembler` requests from a central registry, the `Resourc
 
 ## Implementation details
 
-The following code snippet shows the part of `VisitModuleResourceExtensions` which registers a callback function for the `Patient` which is called whenever a REST resource for the `Patient` entity is requested.
+The following code snippet shows the part of `VisitModuleResourceExtensions` which registers a callback function for the `Patient` which is called whenever a REST resource for the `Patient` entity is requested. This is done with the help of the `registerLink` method provided by the base class `ResourceExtensions`.
 
 ```java
 @Component
@@ -96,14 +96,7 @@ public class VisitModuleResourceExtensions extends ResourceExtensions {
 }
 ```
 
-```java
-var resource = PatientModel.from(patient);
-var selfLink = linkTo(PatientController.class).slash(patient.getId()).withSelfRel();
-resource.add(selfLink);
-resource.add(resourceExtensionsRegistry.getLinks(Patient.class, patient));
-```
-
-So the _visit_ module needs to register a callback function in the `ResourceExtensionsRegistry`.
+Within the method `createStartVisitLink` it is looked up whether there is already a patient with an active visit present. If yes, the "start-visit" link is not needed and the method returns an empty result. If no, then then "start-visit" link is generated with the help of Spring HATEOAS which can infer the resource path from the respective REST controller class and method.
 
 ```java
 private Optional<Link> createStartVisitLink(Patient patient) {
@@ -116,6 +109,41 @@ private Optional<Link> createStartVisitLink(Patient patient) {
 }
 ```
 
+The `ResourceExtensions` class then delates the link registration to the `ResourceExtensionsRegistry`. And it takes care to execute the registration process at the time of the application startup, with the help of Spring's `@PostConstruct` annotation which markes a method which is executed right after a Spring Bean has been created.
+
+```java
+@RequiredArgsConstructor
+public abstract class ResourceExtensions {
+
+    private final ResourceExtensionsRegistry resourceExtensionsRegistry;
+
+    @PostConstruct
+    protected abstract void init();
+
+    protected final <T> void registerLink(Class<T> cls, Function<T, Optional<Link>> linkProvider) {
+        resourceExtensionsRegistry.registerLink(cls, linkProvider);
+    }
+}
+```
+
+Finally, when the patient resource gets created, the required links are pulled from the extensions registry. By providing the patient entity to the `getLinks` method, the callback function described above can be called to generated the links dynamically.
+
+```java
+@Component
+@RequiredArgsConstructor
+class PatientResourceAssembler implements RepresentationModelAssembler<Patient, PatientResource> {
+
+    private final ResourceExtensionsRegistry resourceExtensionsRegistry;
+
+    @Override
+    public PatientResource toModel(Patient patient) {
+        var result = PatientResource.from(patient);
+        // ...
+        result.add(resourceExtensionsRegistry.getLinks(Patient.class, patient));
+        return result;
+    }
+}
+```
 
 ## References
 
